@@ -108,7 +108,7 @@ def get_all_data_and_cutoffs(location = '/Users/claytonstrawn/Santi_CLOUDY_data/
     cutoffs = []
     for i,f in enumerate(sorted(filenames)):
         data.append(get_data_from_file(f))
-        cutoffs.append(find_PI_cutoff(data[-1],threshold=.05,min_stable_num=5,loud=False))
+        cutoffs.append(find_PI_cutoff(data[-1],threshold=.01,min_stable_num=5,loud=False))
     return sorted(data),sorted(cutoffs)
 
     

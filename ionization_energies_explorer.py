@@ -71,21 +71,21 @@ def get_energy_dict():
         ionization_energy_dict[ion] = energy_dict_cumulative[atom][ionization-2]
     return atoms,ions,ionization_energy_dict
 
-def get_cutoffs_dict(ions):
+def get_cutoffs_dict(ions,redshift):
     #note: depends on quasarscan installation
     from quasarscan.utils.PI_field_defs import cutoffs_for_ion_at_redshift
     
     PI_cutoff_temps_dict = {}
     for ion in ions:
         try:
-            PI_cutoff_temps_dict[ion] = np.median(cutoffs_for_ion_at_redshift(ion,2.0))
+            PI_cutoff_temps_dict[ion] = np.median(cutoffs_for_ion_at_redshift(ion,redshift))
         except KeyError:
             PI_cutoff_temps_dict[ion] = np.nan
     return PI_cutoff_temps_dict
 
-def get_energy_cutoffs_dicts():
+def get_energy_cutoffs_dicts(redshift=2.0):
     atoms,ions,ionization_energy_dict = get_energy_dict()
-    return atoms,ions,ionization_energy_dict,get_cutoffs_dict(ions)
+    return atoms,ions,ionization_energy_dict,get_cutoffs_dict(ions,redshift)
 
 def view_energies(atoms,ions,ionization_energy_dict=None,cutoffs_dict = None):
     for ion in ions:
