@@ -26,6 +26,7 @@ class DataCube:
         self.data = data
         if isinstance(data,np.ndarray):
             self.data = data
+            self.d = data
         elif isinstance(data,list):
             data = np.array(data)
             self.data = data
@@ -34,11 +35,14 @@ class DataCube:
         self.string_lists = string_lists
         assert len(string_lists) == len(data.shape),'len(string_lists) must equal len(data.shape),'+\
                     'yours were %d and %d'%(len(string_lists),len(data.shape))
+        used_labels = []
         for i,l in enumerate(string_lists):
             assert len(l) == data.shape[i],'column %d has length %d, but %d labels were given,'\
                             %(i,data.shape[i],len(l))
             for string in l:
                 assert '-' not in string,'Not allowed to use variable names containing "-". [violator: %s]'%string
+                assert string not in used_labels,'Not allowed to reuse variable names containing. [violator: %s]'%string
+                used_labels.append(string)
         self.string_list_names = [l[0] for l in string_lists]
         self.string_list_numbers = {}
         for i,name in enumerate(self.string_list_names):
@@ -76,6 +80,27 @@ class DataCube:
                     raise IndexError('arg %s not in any list of remaining elements: %s'%(arg,str_lists_to_use))
                 element_access_str = ':,'*i+'%d,'%element+':,'*(len(str_lists_to_use)-i-1)
             to_return = eval('to_return[%s]'%element_access_str[:-1])
-        return to_return
+        not_used = list(set(self.string_list_names)-set(used))
+        str_list_indices_to_use = sorted([self.string_list_numbers[k] for k in not_used])
+        str_lists_to_use = [self.string_lists[k] for k in str_list_indices_to_use]
+        return DataCube(to_return,str_lists_to_use)
     def __repr__(self):
-        return "<%d-D DataCube with categories %s>"%(len(self.string_lists),str(self.string_lists))
+        list_reprs = []
+        for string_list in self.string_lists:
+            r = '['
+            if len(string_list)>8:
+                for i,l in enumerate(string_list):
+                    if i<3:
+                        r+="'%s', "%l
+                    elif i==3:
+                        r+="'%s', ..., "%l
+                    elif i==len(string_list)-1:
+                        r+="'%s'"%l
+            else:
+                r += str(string_list).strip('[]')
+            list_reprs.append(r+']')
+        return "<%d-D DataCube with categories %s>"%(len(self.string_lists),str(list_reprs).replace('"',''))
+    def print_lists(self):
+        print("%d-D DataCube:"%len(self.string_lists))
+        for string_list in self.string_lists:
+            print(string_list)
