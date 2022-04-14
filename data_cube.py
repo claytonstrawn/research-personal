@@ -77,3 +77,5 @@ class DataCube:
                 element_access_str = ':,'*i+'%d,'%element+':,'*(len(str_lists_to_use)-i-1)
             to_return = eval('to_return[%s]'%element_access_str[:-1])
         return to_return
+    def __repr__(self):
+        return "<%d-D DataCube with categories %s>"%(len(self.string_lists),str(self.string_lists))
