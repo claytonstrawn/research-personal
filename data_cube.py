@@ -37,6 +37,8 @@ class DataCube:
         for i,l in enumerate(string_lists):
             assert len(l) == data.shape[i],'column %d has length %d, but %d labels were given,'\
                             %(i,data.shape[i],len(l))
+            for string in l:
+                assert '-' not in string,'Not allowed to use variable names containing "-". [violator: %s]'%string
         self.string_list_names = [l[0] for l in string_lists]
         self.string_list_numbers = {}
         for i,name in enumerate(self.string_list_names):
@@ -45,7 +47,7 @@ class DataCube:
     def __getitem__(self,*args):
         to_return = self.data
         used = []
-        if isinstance(args[0],tuple):
+        if len(args) == 1 and isinstance(args[0],tuple):
             args = args[0]
         for arg in args:
             not_used = list(set(self.string_list_names)-set(used))
